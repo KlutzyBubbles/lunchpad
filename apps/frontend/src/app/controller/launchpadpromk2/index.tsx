@@ -1,5 +1,6 @@
 import React from 'react';
 import lodash from 'lodash';
+import { deserialize } from 'typescript-json-serializer';
 
 import { LaunchpadButton as Button } from '@lunchpad/base'
 import { TriangleRight, TriangleUpSolid, Circle, TriangleDownSolid, TriangleLeftSolid, TriangleRightSolid, Icon } from '@lunchpad/icons';
@@ -73,7 +74,13 @@ const Component: React.SFC<IPadProps> = (props) => (
   <PadContainer width={10} height={10}>
     {lodash.reverse(lodash.range(0, 10)).map((y) => lodash.range(0,10).map((x) => {
       const isButton = lodash.get(props.activePage, `buttons.${x}.${y}`, false);
-      const button: LaunchpadButton  = lodash.get(props.activePage, `buttons.${x}.${y}`, new LaunchpadButton()) // as Button;
+      let button = new LaunchpadButton()
+      try {
+        let newBtn = deserialize<LaunchpadButton>(lodash.get(props.activePage, `buttons.${x}.${y}`, {}), LaunchpadButton)
+        if (LaunchpadButton.isValidLaunchpadButton(newBtn)) {
+          button = Object.assign(new LaunchpadButton(), newBtn);
+        }
+      } catch (ex) {}
       const color = MakeButtonColor(button.color)
       const { buttonProps } = props;
 
@@ -130,8 +137,13 @@ const buildColors = (send: (code: number[], data: number[]) => void, page: Page,
 
   // Build color array
   lodash.range(0, 10).map((y) => lodash.range(0,10).map((x) => {
-    const button: LaunchpadButton = lodash.get(page, `buttons.${x}.${y}`);
-    //console.log(activeButtons, x,y , lodash.some(activeButtons, { x, y }))
+    let button = new LaunchpadButton()
+    try {
+      let newBtn = deserialize<LaunchpadButton>(lodash.get(page, `buttons.${x}.${y}`, {}), LaunchpadButton)
+      if (LaunchpadButton.isValidLaunchpadButton(newBtn)) {
+        button = Object.assign(new LaunchpadButton(), newBtn);
+      }
+    } catch (ex) {}
     if (button) {
       const isActive = lodash.some(activeButtons, { x, y });
 

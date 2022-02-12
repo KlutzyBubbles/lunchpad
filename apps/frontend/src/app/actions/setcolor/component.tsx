@@ -182,7 +182,7 @@ export const SetColorPill: React.SFC<ISetColorPill> = (props) => {
   }
   
   const setColorMode = (mode: LaunchpadButtonColorMode) => {
-    if (mode === -1) return setColor(undefined);
+    if (mode === LaunchpadButtonColorMode.Off) return setColor(undefined);
 
     if (mode === LaunchpadButtonColorMode.Static) {
       setColor(new LaunchpadSolidButtonColor(LaunchpadSolidButtonColor.RandomIndex()))

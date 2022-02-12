@@ -106,6 +106,7 @@ export class LaunchpadRGBButtonColor extends LaunchpadButtonColorBase {
 
 
 export enum LaunchpadButtonColorMode {
+  Off = -1,
   Static = 0,
   Flashing = 1,
   Pulsing = 2,

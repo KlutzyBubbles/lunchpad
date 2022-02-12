@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import lodash from 'lodash';
+import { deserialize } from 'typescript-json-serializer';
 
 import * as Devices from '../../controller/index';
 
@@ -16,8 +17,9 @@ import { Counter } from '../../actions/pushtotalk/counter';
 import { OBSStudioContext } from '../obs-studio';
 import { PushToTalk } from '../../actions/pushtotalk';
 import { Action } from '../../actions';
-import { LaunchpadButton } from '../layout/classes';
+import { LaunchpadButton, LaunchpadButtonColorBase, LaunchpadButtonColorMode, LaunchpadFlashingButtonColor, LaunchpadPulsingButtonColor, LaunchpadRGBButtonColor, LaunchpadSolidButtonColor } from '../layout/classes';
 import { LayoutContext } from '../layout';
+import { SetColor } from '../../actions/setcolor';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -92,8 +94,14 @@ const MacroProvider = ({ children }) => {
 
     const pressed = (note: number, cc: boolean) => {
       const [ x, y ] = pad.ButtonToXY(note, cc);
-      const button = lodash.get(layout.activePage, `buttons.${x}.${y}`, undefined) as LaunchpadButton;
-      if (!button || button.down.length <= 0) return;
+      let button = new LaunchpadButton()
+      try {
+        let newBtn = deserialize<LaunchpadButton>(lodash.get(layout.activePage, `buttons.${x}.${y}`, {}), LaunchpadButton)
+        if (LaunchpadButton.isValidLaunchpadButton(newBtn)) {
+          button = Object.assign(new LaunchpadButton(), newBtn);
+        }
+      } catch (ex) {}
+      if (!button) return;
       
       const PlayMacro = (actions: Action[], loop: boolean, x: number, y: number, oldId: (string | false) = false) => {
         const id = uniqueId();
@@ -163,8 +171,14 @@ const MacroProvider = ({ children }) => {
     
     const released = (note: number, cc: boolean) => {
       const [ x, y ] = pad.ButtonToXY(note, cc);
-      const button = lodash.get(layout.activePage, `buttons.${x}.${y}`) as LaunchpadButton;
-      if (!button || button.up.length <= 0) return;
+      let button = new LaunchpadButton()
+      try {
+        let newBtn = deserialize<LaunchpadButton>(lodash.get(layout.activePage, `buttons.${x}.${y}`, {}), LaunchpadButton)
+        if (LaunchpadButton.isValidLaunchpadButton(newBtn)) {
+          button = Object.assign(new LaunchpadButton(), newBtn);
+        }
+      } catch (ex) {}
+      if (!button) return;
       const id = uniqueId();
 
       const macro = new MacroRunner(button, contexts, x, y, false);

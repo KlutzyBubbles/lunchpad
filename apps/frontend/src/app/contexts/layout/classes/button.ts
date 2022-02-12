@@ -113,10 +113,11 @@ export class LaunchpadButton {
         return new TextToSpeech(tts.text, tts.volume);
       } else if (action.type === ActionType.SetColor) {
         const color = ((action as SetColor).color as LaunchpadButtonColorBase)
-        if ((action as SetColor).color.mode === LaunchpadButtonColorMode.Static) return new LaunchpadSolidButtonColor((color as LaunchpadSolidButtonColor).color);
-        if ((action as SetColor).color.mode === LaunchpadButtonColorMode.Flashing) return new LaunchpadFlashingButtonColor((color as LaunchpadFlashingButtonColor).color, (color as LaunchpadFlashingButtonColor).alt);
-        if ((action as SetColor).color.mode === LaunchpadButtonColorMode.Pulsing) return new LaunchpadPulsingButtonColor((color as LaunchpadPulsingButtonColor).color);
-        if ((action as SetColor).color.mode === LaunchpadButtonColorMode.RGB) return new LaunchpadRGBButtonColor((color as LaunchpadRGBButtonColor).color);
+        const setColor = new SetColor;
+        if ((action as SetColor).color.mode === LaunchpadButtonColorMode.Static) setColor.color = new LaunchpadSolidButtonColor((color as LaunchpadSolidButtonColor).color);
+        if ((action as SetColor).color.mode === LaunchpadButtonColorMode.Flashing) setColor.color = new LaunchpadFlashingButtonColor((color as LaunchpadFlashingButtonColor).color, (color as LaunchpadFlashingButtonColor).alt);
+        if ((action as SetColor).color.mode === LaunchpadButtonColorMode.Pulsing) setColor.color = new LaunchpadPulsingButtonColor((color as LaunchpadPulsingButtonColor).color);
+        if ((action as SetColor).color.mode === LaunchpadButtonColorMode.RGB) setColor.color = new LaunchpadRGBButtonColor((color as LaunchpadRGBButtonColor).color);
       }
       return action;
     })
@@ -129,5 +130,12 @@ export class LaunchpadButton {
     this.loop = false;
     this.down = [];
     this.up = [];
+  }
+
+  static isValidLaunchpadButton(object: any): boolean {
+    if ('up' in object && 'down' in object && 'color' in object && 'loop' in object && 'look' in object) {
+      return !!object.up && !!object.down && !!object.color && !!object.look && object.loop != undefined
+    }
+    return false
   }
 }

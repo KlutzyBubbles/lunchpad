@@ -1,5 +1,6 @@
 import * as React from 'react';
 import lodash from 'lodash';
+import { deserialize } from 'typescript-json-serializer';
 
 import { LaunchpadButton as Button } from '@lunchpad/base'
 
@@ -21,7 +22,13 @@ const Component: React.SFC<IPadProps> = (props) => (
   <PadContainer width={6} height={6}>
     {lodash.reverse(lodash.range(0, 6)).map((y) => lodash.range(0,6).map((x) => {
       const isButton = lodash.get(props.activePage, `buttons.${x}.${y}`, false);
-      const button: LaunchpadButton  = lodash.get(props.activePage, `buttons.${x}.${y}`, new LaunchpadButton()) // as Button;
+      let button = new LaunchpadButton()
+      try {
+        let newBtn = deserialize<LaunchpadButton>(lodash.get(props.activePage, `buttons.${x}.${y}`, {}), LaunchpadButton)
+        if (LaunchpadButton.isValidLaunchpadButton(newBtn)) {
+          button = Object.assign(new LaunchpadButton(), newBtn);
+        }
+      } catch (ex) {}
       const color = MakeButtonColor(button.color)
       const { buttonProps } = props;
 

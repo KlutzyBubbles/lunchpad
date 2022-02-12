@@ -58,7 +58,7 @@ export class MacroRunner extends EventEmitter {
     this.down = down;
     this.x = x;
     this.y = y;
-    
+
     for(const raw of down ? button.down : button.up) {
       switch (raw.type) {
         case ActionType.Delay:
@@ -118,7 +118,7 @@ export class MacroRunner extends EventEmitter {
     let flipFlopActive = false;
     let flipFlopA = true;
 
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       do {
         actionPromises = new Array<Promise<unknown>>();
         
